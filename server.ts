@@ -22,15 +22,15 @@ const authenticateToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  /*const authHeader = req.headers["authorization"];
+  const authHeader = req.headers["authorization"];
   const token = authHeader;
-  if (!token) return res.sendStatus(401);*/
+  if (!token) return res.sendStatus(401);
 
-  const { email } = req.body as { email: string };
-  const verifyToken = await redis.hget(email, "token");
+  /*const { email } = req.body as { email: string };
+  const verifyToken = await redis.hget(email, "token");*/
 
   jwt.verify(
-    verifyToken,
+    token,
     process.env.ACCESS_TOKEN_SECRET as string,
     (err: Error, email: string) => {
       if (err) return res.sendStatus(403);
