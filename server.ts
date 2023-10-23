@@ -1,8 +1,10 @@
-const express = require("express");
-const app = express();
+import express, { Request, Response, NextFunction, Application } from "express";
+import { types } from "util";
 const redis = require("./redis");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+
+const app: Application = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -15,30 +17,42 @@ app.listen(PORT, () => {
 
 // Middleware authenticateToken
 
-const authenticateToken = async (req, res, next) => {
-  const authHeader = req.headers["authorization"];
+const authenticateToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.header["authorization"];
   const token = authHeader;
-
   if (!token) return res.sendStatus(401);
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, email) => {
-    if (err) return res.sendStatus(403);
-    res.locals.email = email;
+  /*const { email } = req.body as { email: string };
+  const verifyToken = await redis.hget(email, "token");*/
 
-    next();
-  });
+  jwt.verify(
+    token,
+    process.env.ACCESS_TOKEN_SECRET as string,
+    (err: Error, email: string) => {
+      if (err) return res.sendStatus(403);
+      //req.email = email;
+      next();
+    }
+  );
 };
 
 // Middleware rate limit
 
-const rateLimitCheck = async (req, res, next) => {
-  const { text } = req.body;
-  const { email } = res.locals.email;
-  const rateLimit = 500;
+const rateLimitCheck = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email, text } = req.body as { email: string; text: string };
+  const rateLimit: number = 500;
   const words = text.split(" ");
-  const userCount = await redis.hget(email, "count");
+  const userCount: number = await redis.hget(email, "count");
 
-  const wordLeftBeforeLimit = rateLimit - userCount;
+  const wordLeftBeforeLimit: number = rateLimit - userCount;
 
   if (userCount + words.length > rateLimit) {
     res
@@ -53,26 +67,38 @@ const rateLimitCheck = async (req, res, next) => {
 
 // Middleware  interval word reset
 
-const timeIntervalChecking = async (req, res, next) => {
-  const { email } = res.locals.email;
-  const userTime = await redis.hget(email, "time");
+const timeIntervalChecking = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email } = req.body as { email: string };
+  const userTime: number = await redis.hget(email, "time");
   resetCount(userTime, email);
   next();
 };
 
 // request Token
 
-app.post("/api/token", async (req, res) => {
+type User = {
+  count: number;
+  token: string;
+  email: string;
+  time: Date;
+};
+
+app.post("/api/token", async (req: Request, res: Response) => {
   const now = new Date();
-  const userEmail = req.body.email;
+  const userEmail: string = req.body.email;
   const email = { email: userEmail };
 
-  const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
+  const accessToken: string = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
   res.status(200).json({ email: userEmail, accessToken: accessToken });
 
   try {
-    const response = await redis.hset(userEmail, {
+    const response: User = await redis.hset(userEmail, {
       count: 0,
+      token: accessToken,
       email: userEmail,
       time: now,
     });
@@ -90,9 +116,8 @@ app.post(
   authenticateToken,
   timeIntervalChecking,
   rateLimitCheck,
-  (req, res) => {
-    const { text } = req.body;
-    const { email } = res.locals.email;
+  (req: Request, res: Response) => {
+    const { text, email } = req.body as { text: string; email: string };
     res.type("txt");
 
     let response = justifyText(text, 80, email);
@@ -102,10 +127,10 @@ app.post(
 
 // Justify function
 
-const justifyText = (text, maxLength, email) => {
+const justifyText = (text: string, maxLength: number, email: string) => {
   const words = text.split(" ");
   let currentLine = "";
-  const lines = [];
+  const lines: string[] = [];
 
   for (let i = 0; i < words.length; i++) {
     if (currentLine.length + words[i].length + 1 <= maxLength) {
@@ -123,17 +148,15 @@ const justifyText = (text, maxLength, email) => {
     const AmountOfWordInline = line.split(" ");
     let numberOfCharacterInLine = maxLength - line.length;
     let justifyLine = "";
+
     for (let j = 0; j < AmountOfWordInline.length; j++) {
       let word = AmountOfWordInline[j];
-      //console.log(word);
       if (numberOfCharacterInLine > 0) {
         justifyLine += word + "  ";
         numberOfCharacterInLine -= 1;
       } else {
         justifyLine += word + " ";
       }
-      //console.log(justifyLine);
-      //console.log(numberOfCharacterInLine);
     }
     lines[i] = justifyLine;
   }
@@ -143,15 +166,16 @@ const justifyText = (text, maxLength, email) => {
 
 // Update at a certain time
 
-const resetCount = (userTime, userEmail) => {
+const resetCount = (userTime: number, userEmail: string) => {
   const now = new Date();
   const lastUpdate = new Date(userTime);
-  const interval = 60000; //24 * 60 * 60 * 1000;
-  const numberOfInterval = (now.getTime() - lastUpdate.getTime()) / interval;
-  const updatedTime =
+  const interval: number = 60000; //24 * 60 * 60 * 1000;
+  const numberOfInterval: number =
+    (now.getTime() - lastUpdate.getTime()) / interval;
+  const updatedTime: number =
     interval * Math.floor(numberOfInterval) + lastUpdate.getTime();
 
-  const result = now - lastUpdate - interval;
+  const result: number = now.getTime() - lastUpdate.getTime() - interval;
 
   if (result >= 0) {
     const updateUserTime = redis.hset(
