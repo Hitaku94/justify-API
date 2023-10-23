@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const redis = require("./redis");
 require("dotenv").config();
 
 app.use(express.json());
