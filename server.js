@@ -35,7 +35,7 @@ const authenticateToken = async (req, res, next) => {
 
 // Middleware rate limit
 
-const rateLimitChecking = async (req, res, next) => {
+const rateLimitCheck = async (req, res, next) => {
   const { email } = req.body;
   const rateLimit = 500;
 
@@ -48,9 +48,19 @@ const rateLimitChecking = async (req, res, next) => {
   }
 };
 
+// Middleware  interval word reset
+
+const timeIntervalChecking = async (req, res, next) => {
+  const { email } = req.body;
+  const userTime = await redis.hget(email, "time");
+  resetCount(userTime, email);
+  next();
+};
+
 // request Token
 
 app.post("/api/token", async (req, res) => {
+  const now = new Date();
   const userEmail = req.body.email;
   const email = { email: userEmail };
 
@@ -62,6 +72,7 @@ app.post("/api/token", async (req, res) => {
       count: 0,
       token: accessToken,
       email: userEmail,
+      time: now,
     });
 
     return response;
@@ -72,13 +83,19 @@ app.post("/api/token", async (req, res) => {
 
 // request justify api
 
-app.post("/api/justify", authenticateToken, rateLimitChecking, (req, res) => {
-  const { text, email } = req.body;
-  res.type("txt");
+app.post(
+  "/api/justify",
+  authenticateToken,
+  timeIntervalChecking,
+  rateLimitCheck,
+  (req, res) => {
+    const { text, email } = req.body;
+    res.type("txt");
 
-  let response = justifyText(text, 80, email);
-  res.status(200).send(response);
-});
+    let response = justifyText(text, 80, email);
+    res.status(200).send(response);
+  }
+);
 
 // Justify function
 
@@ -119,4 +136,29 @@ const justifyText = (text, maxLength, email) => {
   }
   redis.hincrby(email, "count", words.length);
   return lines.join("\n");
+};
+
+// Update at a certain time
+
+const resetCount = (userTime, userEmail) => {
+  const now = new Date();
+  const lastUpdate = new Date(userTime);
+  const interval = 60000; //24 * 60 * 60 * 1000;
+  const numberOfInterval = (now.getTime() - lastUpdate.getTime()) / interval;
+  const updatedTime =
+    interval * Math.floor(numberOfInterval) + lastUpdate.getTime();
+
+  const result = now - lastUpdate - interval;
+
+  if (result >= 0) {
+    const updateUserTime = redis.hset(
+      userEmail,
+      "time",
+      new Date(updatedTime),
+      "count",
+      0
+    );
+
+    return updateUserTime;
+  }
 };
