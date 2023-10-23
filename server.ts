@@ -15,7 +15,7 @@ app.listen(PORT, () => {
 
 // Middleware authenticateToken
 
-const authenticateToken = async (req, res, next) => {
+const authenticateToken = async (req: Request, res: Response, next) => {
   /*const authHeader = req.headers["authorization"];
   const token = authHeader;
   if (!token) return res.sendStatus(401);*/
