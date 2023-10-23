@@ -27,7 +27,6 @@ const authenticateToken = async (req, res, next) => {
 
   jwt.verify(verifyToken, process.env.ACCESS_TOKEN_SECRET, (err, email) => {
     if (err) return res.sendStatus(403);
-    console.log(email, "this is the email");
     req.email = email;
     next();
   });
@@ -36,13 +35,19 @@ const authenticateToken = async (req, res, next) => {
 // Middleware rate limit
 
 const rateLimitCheck = async (req, res, next) => {
-  const { email } = req.body;
+  const { email, text } = req.body;
   const rateLimit = 500;
-
+  const words = text.split(" ");
   const userCount = await redis.hget(email, "count");
 
-  if (userCount > rateLimit) {
-    res.status(402).send("Payment Required");
+  const wordLeftBeforeLimit = rateLimit - userCount;
+
+  if (userCount + words.length > rateLimit) {
+    res
+      .status(402)
+      .send(
+        `Payment Required, you still have ${wordLeftBeforeLimit} words to use for free`
+      );
   } else {
     next();
   }
