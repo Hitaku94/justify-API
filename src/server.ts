@@ -16,6 +16,9 @@ app.listen(PORT, () => {
   console.log(`Node API app is running on port ${PORT}`);
 });
 
+app.get("/", (req, res) => {
+  res.send("hello words");
+});
 app.use("/api", routerJustify);
 app.use("/api", routerToken);
 

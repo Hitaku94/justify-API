@@ -15,6 +15,9 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Node API app is running on port ${PORT}`);
 });
+app.get("/", (req, res) => {
+    res.send("hello words");
+});
 app.use("/api", justify_routes_1.default);
 app.use("/api", token_routes_1.default);
 // this middleware will run when requested page is not available
