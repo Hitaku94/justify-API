@@ -11,8 +11,6 @@ You have a rate limit of 8000 words per day for free.
 
 ## Prerequisites
 
-List any software, libraries, or tools that users need to have installed before they can use your project.
-
 - Prerequisite: You need to have a software that can test API (ex: postman).
 
 ## General overview
