@@ -1,6 +1,6 @@
 # Justify-API
 
-API to justify text to 80 caracters maximum per line.
+API to justify text to 80 characters maximum per line.
 You have a rate limit of 8000 words per day for free.
 
 ## Table of Contents
@@ -11,18 +11,18 @@ You have a rate limit of 8000 words per day for free.
 
 ## Prerequisites
 
-- Prerequisite: You need to have a software that can test API (ex: postman).
+- Prerequisite: You need to have software that can test API (ex: postman).
 
-## General overview
+## General Overview
 
-Here is the api url you can use:
+Here is the API URL you can use:
 You have 2 routes :
 
 - "api/token": To retrieve the token that is needed to call "api/justify":
 
   - need a key-value in the body => key = email, value= "your-email"
 
-- "api/justify : once the token is retrieve with "api/token":
+- "api/justify: once the token is retrieved with "api/token":
   - add the key-value in the headers => key = authorization, value = "your-token-just-generated"
   - add the key-value in the body => key = text, value = "your-text-you-want-to-justify"
 
@@ -44,7 +44,7 @@ Step 1 :
 
 Step 2 :
 
-- You will receive a json with your email and a token.
+- You will receive a JSON with your email and a token.
 - Copy the token
 - Go to the headers section
 
@@ -53,7 +53,7 @@ Step 2 :
 Step 3 :
 
 - add in the headers, a key-value => authorization: "your-token-just-copied"
-- Once it's done change your route to : /api/justify
+- Once it's done change your route to: /api/justify
 
 ![Screenshot 3](./screenshots/step-3.png)
 
