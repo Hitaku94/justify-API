@@ -34,6 +34,8 @@ Step 1 :
 -select x-www-form-urlencoded
 -click "send"
 
+![Screenshot 1](./screenshots/step-1.png)
+
 ## Installation
 
 Provide step-by-step installation instructions. Use code blocks and command-line examples for clarity.
