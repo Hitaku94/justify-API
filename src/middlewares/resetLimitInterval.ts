@@ -12,7 +12,7 @@ export const timeIntervalChecking = async (
   next();
 };
 
-const resetCount = (userTime: string, userEmail: string) => {
+export const resetCount = (userTime: string, userEmail: string) => {
   const now = new Date();
   const lastUpdate = new Date(userTime);
   const interval: number = 60000; //24 * 60 * 60 * 1000 for 24hours;

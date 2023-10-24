@@ -19,7 +19,7 @@ app.listen(PORT, () => {
 app.use("/api", routerJustify);
 app.use("/api", routerToken);
 
-// this middleware runs whenever requested page is not available
+// this middleware will run when requested page is not available
 app.use((req, res, next) => {
   res.status(404).json({ errorMessage: "This route does not exist" });
 });
