@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import { redis } from "../config/redis";
 
 export const justifyTextController = (req: Request, res: Response) => {

@@ -19,7 +19,7 @@ describe("rate limit Middleware", () => {
         next = jest.fn();
     });
     it("should send a status code 402 if the number of words is higher than the limit", async () => {
-        verifyMock.mockResolvedValue(495);
+        verifyMock.mockResolvedValue(4995);
         const responseSend = jest.fn();
         res.status = jest.fn().mockReturnValue({ send: responseSend });
         await (0, rateLimit_1.rateLimitCheck)(req, res, next);

@@ -5,7 +5,7 @@ const redis_1 = require("../config/redis");
 const rateLimitCheck = async (req, res, next) => {
     const { text } = req.body;
     const { email } = res.locals.email;
-    const rateLimit = 500;
+    const rateLimit = 8000;
     const words = text.split(" ");
     const userCount = await redis_1.redis.hget(email, "count");
     const wordLeftBeforeLimit = rateLimit - Number(userCount);

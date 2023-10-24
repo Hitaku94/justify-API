@@ -21,12 +21,11 @@ describe("rate limit Middleware", () => {
   });
 
   it("should send a status code 402 if the number of words is higher than the limit", async () => {
-    verifyMock.mockResolvedValue(495);
+    verifyMock.mockResolvedValue(4995);
     const responseSend = jest.fn();
     res.status = jest.fn().mockReturnValue({ send: responseSend });
 
     await rateLimitCheck(req as Request, res as Response, next as NextFunction);
-
     expect(res.status).toHaveBeenCalledWith(402);
     expect(responseSend).toHaveBeenCalledWith(
       "Payment Required, you still have 5 words to use for free"

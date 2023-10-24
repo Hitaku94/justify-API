@@ -23,7 +23,7 @@ describe("time interval checking middleware", () => {
 
   it("should call next() without resetting the count if the time interval is not exceeded", async () => {
     const now = new Date();
-    const userTime = new Date(now.getTime() - 30 * 1000).toString();
+    const userTime = new Date(now.getTime() - 43200000).toString();
     verifyMock.mockResolvedValue(userTime);
 
     await timeIntervalChecking(
@@ -37,8 +37,9 @@ describe("time interval checking middleware", () => {
   });
   it("should call next() while resetting the count if the time interval is exceeded", async () => {
     const now = new Date();
-    const userTime = new Date(now.getTime() - 60 * 1000).toString();
-    verifyMock.mockResolvedValue(userTime);
+    const userTime = new Date(now.getTime() - 186450000);
+    const userTimeString = userTime.toString();
+    verifyMock.mockResolvedValue(userTimeString);
 
     await timeIntervalChecking(
       req as Request,

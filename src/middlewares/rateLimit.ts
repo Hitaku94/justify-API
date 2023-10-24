@@ -8,7 +8,7 @@ export const rateLimitCheck = async (
 ) => {
   const { text } = req.body as { text: string };
   const { email } = res.locals.email as { email: string };
-  const rateLimit: number = 500;
+  const rateLimit: number = 8000;
   const words: string[] = text.split(" ");
   const userCount = await redis.hget(email, "count");
 

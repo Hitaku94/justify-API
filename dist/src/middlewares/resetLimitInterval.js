@@ -12,7 +12,7 @@ exports.timeIntervalChecking = timeIntervalChecking;
 const resetCount = (userTime, userEmail) => {
     const now = new Date();
     const lastUpdate = new Date(userTime);
-    const interval = 60000; //24 * 60 * 60 * 1000 for 24hours;
+    const interval = 86400000; //86400000; // 24hours;
     const numberOfInterval = (now.getTime() - lastUpdate.getTime()) / interval;
     const updatedTime = interval * Math.floor(numberOfInterval) + lastUpdate.getTime();
     const result = now.getTime() - lastUpdate.getTime() - interval;
